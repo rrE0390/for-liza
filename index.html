@@ -30,7 +30,7 @@
       border-color: transparent transparent #ff4d6d transparent;
     }
     .envelope-text {
-      margin-top: 30px; font-size: 20px; color: #ff4d6d; font-weight: bold;
+      margin-top: 40px; font-size: 20px; color: #ff4d6d; font-weight: bold; text-align: center;
     }
 
     /* Главный контент (Сайт) */
@@ -79,12 +79,13 @@
       background: rgba(255, 255, 255, 0.6); padding: 20px 30px;
       border-radius: 20px; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.1);
       backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-bottom: 20px;
     }
     .counter-title { font-size: 16px; color: #ff758f; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
     .timer { display: flex; gap: 15px; justify-content: center; }
     .time-unit { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
     .time-num { font-size: 28px; font-weight: 800; color: #ff4d6d; }
-    .time-label { font-size: 11px; color: #a3a3a3; text-transform: uppercase; margin-top: 20px;}
+    .time-label { font-size: 11px; color: #a3a3a3; text-transform: uppercase; margin-top: 5px;}
 
     /* Падающие лепестки */
     .petal {
@@ -92,8 +93,16 @@
       opacity: 0.7; pointer-events: none; animation: fadeRain 5s linear infinite; z-index: 1;
     }
 
+    /* Кнопка управления музыкой на случай блокировки */
+    .music-btn {
+      background: white; border: 1px solid #ffccd5; color: #ff4d6d; padding: 8px 15px;
+      border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; z-index: 5;
+    }
+    .music-btn:hover { background: #fff0f3; }
+
     /* Анимации */
-    @keyframes spin { 0% { transform: rotateY(0deg) rotateX(10deg); } 100% { transform: rotateY(360deg) rotateX(10deg); } }
+    @keyframes spin { 0% { transform: rotateY(0deg) rotateX(12deg); } 100% { transform: rotateY(360deg) rotateX(12deg); } }
     @keyframes pulse { 0%, 100% { max-width: 100%; } 50% { transform: scale(1.12) rotateY(inherit) rotateX(12deg); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     @keyframes fadeRain {
@@ -105,15 +114,15 @@
 </head>
 <body>
 
-  <!-- Фоновая музыка (Нежная инструментальная мелодия) -->
+  <!-- Новая стабильная романтичная музыка из надежной библиотеки звуков -->
   <audio id="bg-music" loop>
-    <source src="https://soundhelix.com" type="audio/mp3">
+    <source src="https://mixkit.co" type="audio/mp3">
   </audio>
 
   <!-- Экран с конвертом -->
   <div id="start-screen" onclick="openEnvelope()">
     <div class="envelope"></div>
-    <div class="envelope-text">Для Лизы. Нажми, чтобы открыть ❤️</div>
+    <div class="envelope-text">Для Лизы.<br>Нажми на конверт, чтобы открыть ❤️</div>
   </div>
 
   <!-- Главное признание -->
@@ -139,10 +148,13 @@
         <div class="time-unit"><span class="time-num" id="seconds">00</span><span class="time-label">секунд</span></div>
       </div>
     </div>
+
+    <!-- Резервная кнопка звука -->
+    <button class="music-btn" onclick="toggleMusic()">🎵 Вкл / Выкл Музыку</button>
   </div>
 
   <script>
-    // Дата начала отношений: 13.02.2026 в 23:46:22
+    // Ваша дата: 13.02.2026 в 23:46:22
     const startDate = new Date(2026, 1, 13, 23, 46, 22).getTime(); 
 
     function updateCounter() {
@@ -165,12 +177,30 @@
       setTimeout(() => {
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('main-content').style.opacity = '1';
-        // Включаем музыку
-        const music = document.getElementById('bg-music');
-        music.play().catch(e => console.log("Музыка заблокирована браузером"));
+        
+        // Принудительный старт музыки при открытии конверта
+        playMusic();
+        
         // Запуск дождя из лепестков
         setInterval(createPetal, 300);
       }, 1000);
+    }
+
+    function playMusic() {
+      const music = document.getElementById('bg-music');
+      music.volume = 0.5; // Громкость на 50%
+      music.play().catch(function(error) {
+         console.log("Браузер всё ещё требует клика: " + error);
+      });
+    }
+
+    function toggleMusic() {
+      const music = document.getElementById('bg-music');
+      if (music.paused) {
+        music.play();
+      } else {
+        music.pause();
+      }
     }
 
     function createPetal() {
